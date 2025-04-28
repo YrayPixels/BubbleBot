@@ -18,6 +18,7 @@ let browser = null;
  * @returns {Promise<Browser>} Puppeteer browser instance
  */
 async function getBrowser() {
+
     if (!browser) {
         browser = await puppeteer.launch({
             headless: true,
