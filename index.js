@@ -19,6 +19,11 @@ actionHandler.setup(bot); // This sets the action handlers
 // Set up contract address handling
 contractHandler.setup(bot);
 
+
+
+
+
+
 // Error handling
 bot.catch((err, ctx) => {
     console.error(`Error for ${ctx.updateType}:`, err);

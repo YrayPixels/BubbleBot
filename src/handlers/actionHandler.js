@@ -1,7 +1,7 @@
 // src/handlers/commandHandler.js - Handles bot commands
 const config = require('../config');
 const { callBack, selectChain, aboutAction, botHelp } = require('../functions/actions');
-const { default: storage } = require('../libs/db');
+const { default: storage } = require('../libs/db')
 
 /**
  * Setup Action handlers for the bot
