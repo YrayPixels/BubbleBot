@@ -13,10 +13,11 @@ function setup(bot) {
     // Handle directly sent contract addresses
     bot.on('text', async (ctx) => {
         const address = ctx.message.text.trim();
-        const chain = ctx.selectedChain;
 
         const username = ctx.from.id
-        if (storage.get(username + 'selectedChain') === undefined) {
+        const chain = await storage.get(username + 'selectedChain')
+
+        if (!chain) {
             selectChain(ctx)
             return;
         }
@@ -42,7 +43,7 @@ async function handleContractAddress(ctx, address) {
         const loadingMsg = await ctx.reply('🔍 Analyzing contract address. Please wait...');
 
         const userId = ctx.from.id
-        const chain = storage.get(userId + 'selectedChain')
+        const chain = await storage.get(userId + 'selectedChain')
 
         // Get token info from Bubblemaps API
         const tokenScore = await bubblemapsService.getMapMetadata(address, chain);

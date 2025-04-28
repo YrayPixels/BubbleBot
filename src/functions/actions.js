@@ -6,6 +6,7 @@ import { Markup } from "telegraf";
 
 const callBack = async (ctx, storage) => {
     const data = ctx.callbackQuery.data;
+    console.log(storage)
 
     if (data.startsWith('analyze:')) {
         const chain = data.split(':')[1]; // eth, bsc, sol, etc.
