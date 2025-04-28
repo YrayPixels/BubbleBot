@@ -28,17 +28,17 @@ function formatTokenInfo(tokenScore, tokenInfo) {
         }
 
 
-        if (tokenInfo.largeHolders) {
-            result += `• Biggest Node: $${tokenInfo.largeHolders.name}\n`;
-            result += `• Amount: $${formatNumber(tokenInfo.largeHolders.amount)}\n`;
-            result += `• Percentage: $${formatNumber(tokenInfo.largeHolders.percentage)}%\n`;
+        if (tokenInfo.largestHolder) {
+            result += `--Biggest Node: $${tokenInfo.largestHolder.name}\n`;
+            result += `     Amount: $${formatNumber(tokenInfo.largestHolder.amount)}\n`;
+            result += `     Percentage: $${formatNumber(tokenInfo.largestHolder.percentage)}%\n`;
 
         }
 
         if (tokenInfo.smallestHolder) {
-            result += `• Smallest Node: $${tokenInfo.smallestHolder.name}\n`;
-            result += `• Amount: $${formatNumber(tokenInfo.smallestHolder.amount)}\n`;
-            result += `• Percentage: $${formatNumber(tokenInfo.smallestHolder.percentage)}%\n`;
+            result += `--Smallest Node: $${tokenInfo.smallestHolder.name}\n`;
+            result += `    Amount: $${formatNumber(tokenInfo.smallestHolder.amount)}\n`;
+            result += `    Percentage: $${formatNumber(tokenInfo.smallestHolder.percentage)}%\n`;
 
         }
 

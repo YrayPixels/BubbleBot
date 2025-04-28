@@ -78,7 +78,7 @@ const botHelp = async (ctx, config) => {
         `*Available Commands:*\n` +
         `/start - Start the bot\n` +
         `/help - Show this help message\n` +
-        `/info - Show information about the bot\n` +
+        `/about - Show information about the bot\n` +
         `/analyze <contract_address> - Analyze a specific contract address\n\n` +
         `You can also simply send a contract address directly to analyze it.`,
         // { parse_mode: 'Markdown' }

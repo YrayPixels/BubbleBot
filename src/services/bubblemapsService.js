@@ -95,7 +95,7 @@ async function getMapdata(address, chain) {
             maxAmount: mapData.metadata.max_amount,
             minAmount: mapData.metadata.min_amount,
             topTenHolders: mapData.nodes.slice(0, 10),
-            largetHolder: mapData.nodes[0],
+            largestHolder: mapData.nodes[0],
             smallestHolder: mapData.nodes[mapData.nodes.length - 1],
             totalHolders: mapData.nodes.length,
         }
