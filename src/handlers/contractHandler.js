@@ -1,5 +1,5 @@
-// src/handlers/contractHandler.js - Handles contract address processing
-const { isValidAddress } = require('../utils/validators');
+const { selectChain } = require('../functions/actions');
+const { default: storage } = require('../libs/db');
 const bubblemapsService = require('../services/bubblemapsService');
 const screenshotService = require('../services/screenshotService');
 const { formatTokenInfo } = require('../utils/formatters');
@@ -9,24 +9,23 @@ const { formatTokenInfo } = require('../utils/formatters');
  * @param {Telegraf} bot - Telegraf bot instance
  */
 function setup(bot) {
-    // Handle forwarded contract address from command handler
-    bot.use(async (ctx, next) => {
-        if (ctx.state.forwardToContractHandler && ctx.state.contractAddress) {
-            await handleContractAddress(ctx, ctx.state.contractAddress);
-            return;
-        }
-        return next();
-    });
 
     // Handle directly sent contract addresses
     bot.on('text', async (ctx) => {
         const address = ctx.message.text.trim();
-        if (isValidAddress(address)) {
+        const chain = ctx.selectedChain;
+
+        const username = ctx.from.id
+        if (storage.get(username + 'selectedChain') === undefined) {
+            selectChain(ctx)
+            return;
+        }
+        if (address !== "") {
             await handleContractAddress(ctx, address);
         } else {
             await ctx.reply(
                 `⚠️ This doesn't appear to be a valid contract address. 
-        'Please send a valid Ethereum or compatible blockchain contract address.'`
+        'Please send a valid ${chain}  address.'`
             );
         }
     });
@@ -42,10 +41,12 @@ async function handleContractAddress(ctx, address) {
         // Send loading message
         const loadingMsg = await ctx.reply('🔍 Analyzing contract address. Please wait...');
 
-        // Get token info from Bubblemaps API
-        const tokenInfo = await bubblemapsService.getTokenInfo(address);
+        const userId = ctx.from.id
+        const chain = storage.get(userId + 'selectedChain')
 
-        if (!tokenInfo) {
+        // Get token info from Bubblemaps API
+        const tokenScore = await bubblemapsService.getMapMetadata(address, chain);
+        if (!tokenScore) {
             await ctx.telegram.editMessageText(
                 ctx.chat.id,
                 loadingMsg.message_id,
@@ -64,19 +65,19 @@ async function handleContractAddress(ctx, address) {
         );
 
         // Generate screenshot of the bubble map
-        const screenshot = await screenshotService.captureTokenBubbleMap(address);
+        const screenshot = await screenshotService.captureTokenBubbleMap(address, chain);
 
         // Get token score
-        const tokenScore = await bubblemapsService.getTokenScore(address);
+        const tokenInfo = await bubblemapsService.getMapdata(address, chain);
 
         // Format all token information
-        const formattedInfo = formatTokenInfo(tokenInfo, tokenScore);
+        const formattedInfo = formatTokenInfo(tokenScore, tokenInfo);
 
         // Send screenshot
         if (screenshot) {
             await ctx.replyWithPhoto(
                 { source: screenshot },
-                { caption: 'Bubble Map Visualization' }
+                { caption: 'Bubble Map for Token' }
             );
         }
 

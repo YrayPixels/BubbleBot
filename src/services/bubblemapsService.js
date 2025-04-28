@@ -2,6 +2,7 @@
 const axios = require('axios');
 const config = require('../config');
 const NodeCache = require('node-cache');
+const { default: storage } = require('../libs/db');
 
 // Initialize cache
 const cache = new NodeCache({
@@ -11,18 +12,17 @@ const cache = new NodeCache({
 
 // Create axios instance for Bubblemaps API
 const bubblemapsApi = axios.create({
-    baseURL: config.bubblemaps.baseUrl,
+    baseURL: config.bubblemaps.metaDataUrl,
     timeout: config.bubblemaps.timeout,
     headers: {
         'Content-Type': 'application/json',
         'Accept': 'application/json',
-        'x-api-key': process.env.BUBBLEMAPS_API_KEY || ''
     }
 });
 
-// Create axios instance for Score API
-const scoreApi = axios.create({
-    baseURL: config.bubblemaps.scoreApiUrl,
+// Create axios instance for Mapdata API
+const mapDataApi = axios.create({
+    baseURL: config.bubblemaps.mapDataUrl,
     timeout: config.bubblemaps.timeout,
     headers: {
         'Content-Type': 'application/json',
@@ -35,41 +35,29 @@ const scoreApi = axios.create({
  * @param {string} address - Contract address to analyze
  * @returns {Promise<Object>} Token information
  */
-async function getTokenInfo(address) {
-    const cacheKey = `token-info-${address}`;
+async function getMapMetadata(address, chain) {
+
+    const cacheKey = `token-score-${address}`;
     const cachedData = cache.get(cacheKey);
 
     if (cachedData) {
         return cachedData;
     }
 
+
     try {
         // First, try to get basic token info
-        const tokenResponse = await bubblemapsApi.get(`/tokens/${address}`);
+        const tokenResponse = await bubblemapsApi.get(`?chain=${chain}&token=${address}`);
 
-        // Get additional market data if available
-        let marketData = {};
-        try {
-            const marketResponse = await bubblemapsApi.get(`/tokens/${address}/market`);
-            marketData = marketResponse.data;
-        } catch (error) {
-            console.log(`Market data not available for ${address}`);
+
+        if (tokenResponse.data.status !== 'OK') {
+            console.log(`Token not found: ${address}`);
+            return "Token not found or not a token contract.";
         }
 
-        // Get holder distribution data
-        let holderData = {};
-        try {
-            const holderResponse = await bubblemapsApi.get(`/tokens/${address}/holders`);
-            holderData = holderResponse.data;
-        } catch (error) {
-            console.log(`Holder data not available for ${address}`);
-        }
 
-        // Combine all data
         const tokenInfo = {
             ...tokenResponse.data,
-            market: marketData,
-            holders: holderData
         };
 
         // Cache the result
@@ -87,8 +75,8 @@ async function getTokenInfo(address) {
  * @param {string} address - Contract address to analyze
  * @returns {Promise<Object>} Token score information
  */
-async function getTokenScore(address) {
-    const cacheKey = `token-score-${address}`;
+async function getMapdata(address, chain) {
+    const cacheKey = `token-info-${address}`;
     const cachedData = cache.get(cacheKey);
 
     if (cachedData) {
@@ -96,15 +84,27 @@ async function getTokenScore(address) {
     }
 
     try {
-        const response = await scoreApi.get(`/score/${address}`);
-        const scoreData = response.data;
+        const response = await mapDataApi.get(`?chain=${chain}&token=${address}`);
+        const mapData = response.data;
 
+        const format = {
+            name: mapData.full_name,
+            symbol: mapData.symbol,
+            address: mapData.token_address,
+            chain: mapData.chain,
+            maxAmount: mapData.metadata.max_amount,
+            minAmount: mapData.metadata.min_amount,
+            topTenHolders: mapData.nodes.slice(0, 10),
+            largetHolder: mapData.nodes[0],
+            smallestHolder: mapData.nodes[mapData.nodes.length - 1],
+            totalHolders: mapData.nodes.length,
+        }
         // Cache the result
-        cache.set(cacheKey, scoreData);
+        cache.set(cacheKey, format);
 
-        return scoreData;
+        return format;
     } catch (error) {
-        console.error('Error fetching token score:', error.message);
+        console.error('Error fetching token info:', error.message);
         return null;
     }
 }
@@ -114,12 +114,13 @@ async function getTokenScore(address) {
  * @param {string} address - Contract address
  * @returns {string} URL for embedding the bubble map
  */
-function getEmbedUrl(address) {
-    return `${config.bubblemaps.embedUrl}/${address}`;
+function getBubbleUrl(address, chain) {
+    return `${config.bubblemaps.tokenUrl}/${chain}/token/${address}`;
 }
 
 module.exports = {
-    getTokenInfo,
-    getTokenScore,
-    getEmbedUrl
+    getMapMetadata,
+    getMapdata,
+    getBubbleUrl
+
 };

@@ -7,26 +7,18 @@ module.exports = {
         commands: [
             { command: 'start', description: 'Start the bot' },
             { command: 'help', description: 'Show help information' },
-            { command: 'info', description: 'Show information about the bot' },
+            { command: 'about', description: 'Show information about the bot' },
             { command: 'analyze', description: 'Analyze a contract address' }
         ]
     },
 
     // Bubblemaps API configuration
     bubblemaps: {
-        frameUrl: process.env.BUBBLEMAPS_FRAME_URL || 'https://bubblemaps.io',
-        scanUrl: process.env.BUBBLEMAPS_SCAN_URL || 'https://scan.bubblemaps.io',
-        baseUrl: process.env.BUBBLEMAPS_API_URL || 'https://api.bubblemaps.io',
-        legacyUrl: process.env.BUBBLEMAPS_LEGACY_URL || 'https://api-legacy.bubblemaps.io/',
+        metaDataUrl: "https://api-legacy.bubblemaps.io/map-metadata",
+        mapDataUrl: "https://api-legacy.bubblemaps.io/map-data",
+        tokenUrl: "https://app.bubblemaps.io",
         timeout: 10000, // 10 seconds
         retries: 3,
-        embedUrl: 'https://bubblemaps.io/embed',
-        scoreApiUrl: 'https://score-api.bubblemaps.io',
-    },
-
-    endpoints: {
-        metaData: legacyUrl + '/map-metadata',
-        mapData: legacyUrl + '/map-data',
     },
 
     // Cache configuration

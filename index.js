@@ -2,14 +2,19 @@
 require('dotenv').config();
 const { Telegraf } = require('telegraf');
 const commandHandler = require('./src/handlers/commandHandler');
+const actionHandler = require('./src/handlers/actionHandler');
 const contractHandler = require('./src/handlers/contractHandler');
 const config = require('./src/config');
 const express = require('express');
+const { default: storage } = require('./src/libs/db');
 
 // Initialize bot with token from environment variables
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);
 
+
 commandHandler.setup(bot); // This sets the bots commands
+
+actionHandler.setup(bot); // This sets the action handlers
 
 // Set up contract address handling
 contractHandler.setup(bot);
@@ -17,7 +22,7 @@ contractHandler.setup(bot);
 // Error handling
 bot.catch((err, ctx) => {
     console.error(`Error for ${ctx.updateType}:`, err);
-    ctx.reply('An error occurred while processing your request. Please try again later.');
+    ctx.reply('An error occurred while processing your request. Please try again later.' + JSON.stringify(err));
 });
 
 // If webhook is configured, use webhook, otherwise use long polling
@@ -38,6 +43,7 @@ if (process.env.NODE_ENV === 'production' && process.env.WEBHOOK_URL) {
     bot.telegram.setWebhook(`${process.env.WEBHOOK_URL}/webhook`);
     console.log(`Bot webhook set to ${process.env.WEBHOOK_URL}/webhook`);
 } else {
+
     // Use long polling
     bot.launch();
     console.log('Bot started with long polling');
