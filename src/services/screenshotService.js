@@ -3,6 +3,8 @@ const puppeteer = require('puppeteer');
 const config = require('../config');
 const bubblemapsService = require('./bubblemapsService');
 const NodeCache = require('node-cache');
+require('dotenv').config()
+
 
 // Initialize cache
 const cache = new NodeCache({
@@ -21,8 +23,12 @@ async function getBrowser() {
 
     if (!browser) {
         browser = await puppeteer.launch({
+            executablePath: process.env.NODE_ENV === 'production' ? process.env.PUPPETEER_EXECUTABLE_PATH : puppeteer.executablePath(),
             headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu'],
+            args: ['--no-sandbox', '--disable-setuid-sandbox',
+                '--single-process',
+                '--no-zygote',
+                '--disable-gpu'],
             defaultViewport: {
                 width: config.screenshot.width,
                 height: config.screenshot.height
