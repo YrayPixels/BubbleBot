@@ -26,28 +26,25 @@ bot.catch((err, ctx) => {
 });
 
 // If webhook is configured, use webhook, otherwise use long polling
-if (process.env.NODE_ENV === 'production' && process.env.WEBHOOK_URL) {
-    // Set up webhook
-    const app = express();
-    app.use(bot.webhookCallback('/webhook'));
+// if (process.env.NODE_ENV === 'production') {
+//     // Set up webhook
+//     const app = express();
 
-    app.get('/', (req, res) => {
-        res.send('Bubblemaps Telegram Bot is running!');
-    });
+//     app.get('/', (req, res) => {
+//         res.send('Bubblemaps Telegram Bot is running!');
+//     });
 
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
-        console.log(`Server running on port ${PORT}`);
-    });
+//     const PORT = process.env.PORT || 3000;
+//     app.listen(PORT, () => {
+//         console.log(`Server running on port ${PORT}`);
+//     });
 
-    bot.telegram.setWebhook(`${process.env.WEBHOOK_URL}/webhook`);
-    console.log(`Bot webhook set to ${process.env.WEBHOOK_URL}/webhook`);
-} else {
+// } else {
 
-    // Use long polling
-    bot.launch();
-    console.log('Bot started with long polling');
-}
+// Use long polling
+bot.launch();
+console.log('Bot started with long polling');
+// }
 
 // Enable graceful stop
 process.once('SIGINT', () => bot.stop('SIGINT'));
