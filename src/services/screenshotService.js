@@ -23,7 +23,7 @@ async function getBrowser() {
 
     if (!browser) {
         browser = await puppeteer.launch({
-            executablePath: process.env.NODE_ENV === 'production' ? process.env.PUPPETEER_EXECUTABLE_PATH : puppeteer.executablePath(),
+            executablePath: puppeteer.executablePath(),
             headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox',
                 '--single-process',
