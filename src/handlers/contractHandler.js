@@ -1,5 +1,5 @@
 const { selectChain } = require('../functions/actions');
-const { default: storage } = require('../libs/db');
+const { storage } = require('../libs/db');
 const bubblemapsService = require('../services/bubblemapsService');
 const screenshotService = require('../services/screenshotService');
 const { formatTokenInfo } = require('../utils/formatters');
