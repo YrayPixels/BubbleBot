@@ -1,4 +1,4 @@
-import { Markup } from "telegraf";
+const { Markup } = require('telegraf')
 
 
 
@@ -144,7 +144,7 @@ const analyzeAction = async (ctx, storage) => {
 };
 
 
-export {
+module.export = {
     callBack,
     selectChain,
     aboutAction,
