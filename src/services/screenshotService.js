@@ -21,18 +21,24 @@ let browser = null;
  */
 async function getBrowser() {
 
+
     if (!browser) {
-        browser = await puppeteer.launch({
-            headless: true,
-            args: ['--no-sandbox', '--disable-setuid-sandbox',
-                '--single-process',
-                '--no-zygote',
-                '--disable-gpu'],
-            defaultViewport: {
-                width: config.screenshot.width,
-                height: config.screenshot.height
-            }
-        });
+        try {
+            browser = await puppeteer.launch({
+                headless: true,
+                args: ['--no-sandbox', '--disable-setuid-sandbox',
+                    '--single-process',
+                    '--no-zygote',
+                    '--disable-gpu'],
+                defaultViewport: {
+                    width: config.screenshot.width,
+                    height: config.screenshot.height
+                }
+            });
+
+        } catch (error) {
+            console.log('Browser', error)
+        }
 
         // Close browser on process exit
         process.on('exit', async () => {
