@@ -23,8 +23,8 @@ async function getBrowser() {
 
     if (!browser) {
         browser = await puppeteer.launch({
-            // executablePath: process.env.NODE_ENV === 'production' ? process.env.PUPPETEER_EXECUTABLE_PATH : puppeteer.executablePath(),
-            headless: true,
+            executablePath: process.env.NODE_ENV === 'production' ? process.env.PUPPETEER_EXECUTABLE_PATH : puppeteer.executablePath(),
+            headless: "new",
             args: ['--no-sandbox', '--disable-setuid-sandbox',
                 '--single-process',
                 '--no-zygote',
@@ -102,17 +102,6 @@ async function captureTokenBubbleMap(address, chain) {
         });
 
         await page.close();
-
-        // // Wait for the bubble map to load
-        // await page.waitForTimeout(config.screenshot.waitTime);
-
-        // // Take screenshot
-        // const screenshot = await page.screenshot({
-        //     type: 'jpeg',
-        //     quality: config.screenshot.quality
-        // });
-
-        // await page.close();
 
         // Cache the result
         cache.set(cacheKey, screenshot);

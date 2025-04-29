@@ -4,9 +4,7 @@ const { Telegraf } = require('telegraf');
 const commandHandler = require('./src/handlers/commandHandler');
 const actionHandler = require('./src/handlers/actionHandler');
 const contractHandler = require('./src/handlers/contractHandler');
-const config = require('./src/config');
 const express = require('express');
-const { default: storage } = require('./src/libs/db');
 
 // Initialize bot with token from environment variables
 const bot = new Telegraf(process.env.TELEGRAM_BOT_TOKEN);

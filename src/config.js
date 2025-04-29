@@ -31,7 +31,7 @@ module.exports = {
     screenshot: {
         width: 1200,
         height: 800,
-        waitTime: 5000, // 5 seconds to wait for map to load
-        quality: 80 // JPEG quality
+        waitTime: 6000, // 5 seconds to wait for map to load
+        quality: 100 // JPEG quality
     }
 };

@@ -2,7 +2,6 @@
 const axios = require('axios');
 const config = require('../config');
 const NodeCache = require('node-cache');
-const { default: storage } = require('../libs/db');
 
 // Initialize cache
 const cache = new NodeCache({
