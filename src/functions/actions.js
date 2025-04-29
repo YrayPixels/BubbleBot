@@ -19,7 +19,7 @@ const callBack = async (ctx, storage) => {
         );
 
         const username = ctx.from.id
-        storage.set(username + 'selectedChain', chain);
+        await storage.set(username + 'selectedChain', chain);
 
         return
     }
@@ -107,7 +107,7 @@ const startAction = async (ctx, config, storage) => {
         `For more information, type /help.`
 
     const username = ctx.from.id
-    storage.delete(username + 'selectedChain'); // Clear all data in the database
+    await storage.delete(username + 'selectedChain'); // Clear all data in the database
 
     await ctx.reply(welcomeMessage, inlineKeyboard);
 
@@ -121,7 +121,7 @@ const analyzeAction = async (ctx, storage) => {
 
 
     const username = ctx.from.id
-    storage.delete(username + 'selectedChain');
+    await storage.delete(username + 'selectedChain');
 
 
 

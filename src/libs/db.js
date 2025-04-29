@@ -1,65 +1,49 @@
-import { initializeApp } from "firebase/app";
-import { getFirestore, doc, getDoc, setDoc, deleteDoc } from "firebase/firestore";
-import dotenv from 'dotenv';
 
-dotenv.config()
-
-const firebaseConfig = {
-    apiKey: process.env.API_KEY,
-    authDomain: process.env.AUTH_DOMAIN,
-    projectId: process.env.PROJECT_ID,
-    storageBucket: process.env.STORAGE_BUCKET,
-    messagingSenderId: process.env.MESSAGING_SENDER_ID,
-    appId: process.env.APPID,
-};
-
-// Initialize Firebase
-const fireapp = initializeApp(firebaseConfig);
-
-const db = getFirestore(fireapp);
 
 const storage = {
     get: async (key) => {
-        const docRef = doc(db, "storage", key);
-        const docSnap = await getDoc(docRef);
 
-        if (docSnap.exists()) {
-            console.log("db (get)", docSnap.data().value);
-            return docSnap.data().value;
+        const response = await fetch(`https://hey.yraytestings.com.ng/api/v2/getchain/${key}`)
+        const res = await response.json()
+        if (res.chain) {
+            return res.chain;
         } else {
-            console.log("No such document!");
+            console.log("No such name!");
             return null;
         }
     },
 
     set: async (key, value) => {
-        const docRef = doc(db, "storage", key);
-        await setDoc(docRef, { value });
-        console.log(`db (set) ${key}:`, value);
+
+        const form = new FormData();
+        form.append('username', key);
+        form.append('chain', value);
+
+        const response = await fetch(`https://hey.yraytestings.com.ng/api/v2/saveId`, {
+            method: "POST",
+            headers: {
+                "Accept": "*/*",
+                "User-Agent": "Thunder Client (https://www.thunderclient.com)"
+            }
+            ,
+            body: form,
+        })
+
+        const res = await response.text()
+        console.log(res);
+        if (res.status == "OK") {
+            console.log(`db (delete) ${key}`);
+        }
+
     },
 
     delete: async (key) => {
-        const docRef = doc(db, "storage", key);
-        await deleteDoc(docRef);
-        console.log(`db (delete) ${key}`);
-    },
-
-    clearAll: async () => {
-        // Firestore doesn't allow collection deletes directly.
-        // You'd need to list all docs and delete them manually.
-        const storageCollection = await import("firebase/firestore/lite").then(m => m.collection(db, "storage"));
-        const snapshot = await import("firebase/firestore/lite").then(m => m.getDocs(storageCollection));
-
-        const batchDelete = import("firebase/firestore/lite").then(m => m.writeBatch(db));
-
-        for (const docSnap of snapshot.docs) {
-            const docRef = doc(db, "storage", docSnap.id);
-            (await batchDelete).delete(docRef);
+        const response = await fetch(`https://hey.yraytestings.com.ng/api/v2/deletechain/${key}`)
+        const res = await response.json()
+        if (res.status == "OK") {
+            console.log(`db (delete) ${key}`);
         }
-
-        (await batchDelete).commit();
-        console.log("db (clearAll): Storage cleared");
-    }
+    },
 };
 
 export default storage;
