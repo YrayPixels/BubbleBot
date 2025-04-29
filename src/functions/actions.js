@@ -144,7 +144,7 @@ const analyzeAction = async (ctx, storage) => {
 };
 
 
-module.export = {
+module.exports = {
     callBack,
     selectChain,
     aboutAction,
