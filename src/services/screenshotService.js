@@ -71,12 +71,15 @@ async function captureTokenBubbleMap(address, chain) {
         // Wait for the SVG element to be available
 
         await page.waitForSelector(`#svg`);
-        await page.evaluate(() => {
-            const dialog = document.querySelector('.mdc-dialog');
-            if (dialog) {
-                dialog.style.display = 'none';
-            }
-        });
+        // await page.waitForSelector('.mdc-dialog', { visible: true });
+
+        const isDialogPresent = await page.$('.mdc-dialog');
+        if (!!isDialogPresent) {
+            await page.evaluate(() => {
+                document.querySelectorAll('.mdc-dialog').forEach(el => el.remove());
+            });
+        }
+
         // Get the bounding box of the SVG element
         const svgBoundingBox = await page.evaluate((id) => {
             const element = document.getElementById(id);
