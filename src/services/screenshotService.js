@@ -24,7 +24,7 @@ async function getBrowser() {
     if (!browser) {
         browser = await puppeteer.launch({
             executablePath: process.env.NODE_ENV === 'production' ? process.env.PUPPETEER_EXECUTABLE_PATH : puppeteer.executablePath(),
-            headless: "new",
+            headless: true,
             args: ['--no-sandbox', '--disable-setuid-sandbox',
                 '--single-process',
                 '--no-zygote',
@@ -69,8 +69,14 @@ async function captureTokenBubbleMap(address, chain) {
 
 
         // Wait for the SVG element to be available
-        await page.waitForSelector(`#svg`, { timeout: config.screenshot.waitTime });
 
+        await page.waitForSelector(`#svg`);
+        await page.evaluate(() => {
+            const dialog = document.querySelector('.mdc-dialog');
+            if (dialog) {
+                dialog.style.display = 'none';
+            }
+        });
         // Get the bounding box of the SVG element
         const svgBoundingBox = await page.evaluate((id) => {
             const element = document.getElementById(id);
