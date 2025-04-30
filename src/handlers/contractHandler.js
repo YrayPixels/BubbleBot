@@ -1,9 +1,17 @@
+const { Markup } = require('telegraf');
 const { selectChain } = require('../functions/actions');
 const { storage } = require('../libs/db');
 const bubblemapsService = require('../services/bubblemapsService');
 const screenshotService = require('../services/screenshotService');
 const { formatTokenInfo } = require('../utils/formatters');
+const NodeCache = require('node-cache');
+const config = require('../config');
 
+
+const cache = new NodeCache({
+    stdTTL: config.cache.ttl,
+    checkperiod: config.cache.checkPeriod
+});
 /**
  * Setup contract handler for the bot
  * @param {Telegraf} bot - Telegraf bot instance
@@ -66,7 +74,7 @@ async function handleContractAddress(ctx, address) {
         );
 
         // Generate screenshot of the bubble map
-        const screenshot = await screenshotService.captureTokenBubbleMap(address, chain);
+        // const screenshot = await screenshotService.captureTokenBubbleMap(address, chain);
 
         // Get token score
         const tokenInfo = await bubblemapsService.getMapdata(address, chain);
@@ -74,16 +82,39 @@ async function handleContractAddress(ctx, address) {
         // Format all token information
         const formattedInfo = formatTokenInfo(tokenScore, tokenInfo);
 
-        // Send screenshot
-        if (screenshot) {
-            await ctx.replyWithPhoto(
-                { source: screenshot },
-                { caption: 'Bubble Map for Token' }
+        const key = `explain:${address}:${userId}`;
+
+        function removeEmojis(text) {
+            return text.replace(
+                /([\u2700-\u27BF]|[\uE000-\uF8FF]|\u24C2|[\uD83C-\uDBFF\uDC00-\uDFFF])+/g,
+                ''
             );
         }
+        storage.set(key, removeEmojis(formattedInfo))
+
+        // Send screenshot
+        // if (screenshot) {
+        //     await ctx.replyWithPhoto(
+        //         { source: screenshot },
+        //         { caption: 'Bubble Map for Token' }
+        //     );
+        // }
 
         // Send token information
         await ctx.reply(formattedInfo, { parse_mode: 'Markdown' });
+
+
+        const inlineKeyboard = Markup.inlineKeyboard([
+            [
+                Markup.button.callback('Explain with AI 🤖', key)
+            ]
+        ]);
+
+        await ctx.reply(
+            'Want more analysis?',
+            inlineKeyboard
+        );
+
 
         // Delete loading message
         await ctx.telegram.deleteMessage(ctx.chat.id, loadingMsg.message_id);

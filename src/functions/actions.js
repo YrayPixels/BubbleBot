@@ -1,12 +1,13 @@
-const { Markup } = require('telegraf')
 
+require('dotenv').config();
+const { GoogleGenerativeAI } = require('@google/generative-ai');
+const { Markup } = require('telegraf');
 
 
 
 
 const callBack = async (ctx, storage) => {
     const data = ctx.callbackQuery.data;
-    console.log(storage)
 
     if (data.startsWith('analyze:')) {
         const chain = data.split(':')[1]; // eth, bsc, sol, etc.
@@ -22,6 +23,41 @@ const callBack = async (ctx, storage) => {
         await storage.set(username + 'selectedChain', chain);
 
         return
+    }
+
+    if (data.startsWith('explain:')) {
+        const loadingMsg = await ctx.reply('🔍 Analyzing Token Information. Please wait...');
+
+        const fetchedData = await storage.get(data)
+
+
+        if (!fetchedData) {
+            await ctx.telegram.editMessageText(
+                ctx.chat.id,
+                loadingMsg.message_id,
+                undefined,
+                '📊 Analysis Failed'
+            );
+        }
+        const genAI = new GoogleGenerativeAI(process.env.GA_KEY || "");
+        const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+
+        const explainText = async (sentence) => {
+            const result = await model.generateContent([
+                `"${sentence} "You are a trading expert with knowledge on how tokennomics works with this information given  I want you to explain to me what it means and how It affects the token integrity and also the general outlook on the token
+        `,
+            ]);
+            return result.response.text();
+        };
+
+        const aiExplanation = await explainText(fetchedData)
+
+        await ctx.telegram.editMessageText(
+            ctx.chat.id,
+            loadingMsg.message_id,
+            undefined,
+            aiExplanation,
+        );
     }
 }
 

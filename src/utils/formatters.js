@@ -21,24 +21,24 @@ function formatTokenInfo(tokenScore, tokenInfo) {
         result += `*📊 Market Data:*\n`;
 
         if (tokenInfo.maxAmount) {
-            result += `• Max Amount: $${formatNumber(tokenInfo.maxAmount)}\n`;
+            result += `• Max Amount: $${tokenInfo.symbol}${formatNumber(tokenInfo.maxAmount)}\n`;
         }
         if (tokenInfo.minAmount) {
-            result += `• Min Amount: $${formatNumber(tokenInfo.minAmount)}\n`;
+            result += `• Min Amount: $${tokenInfo.symbol}${formatNumber(tokenInfo.minAmount)}\n`;
         }
 
 
         if (tokenInfo.largestHolder) {
-            result += `--Biggest Node: $${tokenInfo.largestHolder.name}\n`;
-            result += `     Amount: $${formatNumber(tokenInfo.largestHolder.amount)}\n`;
-            result += `     Percentage: $${formatNumber(tokenInfo.largestHolder.percentage)}%\n`;
+            result += `--Biggest Node: ${tokenInfo.largestHolder.name}\n`;
+            result += `     Amount: $${tokenInfo.symbol}${formatNumber(tokenInfo.largestHolder.amount)}\n`;
+            result += `     Percentage: ${formatNumber(tokenInfo.largestHolder.percentage)}%\n`;
 
         }
 
         if (tokenInfo.smallestHolder) {
             result += `--Smallest Node: $${tokenInfo.smallestHolder.name}\n`;
-            result += `    Amount: $${formatNumber(tokenInfo.smallestHolder.amount)}\n`;
-            result += `    Percentage: $${formatNumber(tokenInfo.smallestHolder.percentage)}%\n`;
+            result += `    Amount: $${tokenInfo.symbol}${formatNumber(tokenInfo.smallestHolder.amount)}\n`;
+            result += `    Percentage: ${formatNumber(tokenInfo.smallestHolder.percentage)}%\n`;
 
         }
 
