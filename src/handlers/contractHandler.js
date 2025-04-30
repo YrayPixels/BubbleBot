@@ -74,7 +74,7 @@ async function handleContractAddress(ctx, address) {
         );
 
         // Generate screenshot of the bubble map
-        // const screenshot = await screenshotService.captureTokenBubbleMap(address, chain);
+        const screenshot = await screenshotService.captureTokenBubbleMap(address, chain);
 
         // Get token score
         const tokenInfo = await bubblemapsService.getMapdata(address, chain);
@@ -93,12 +93,12 @@ async function handleContractAddress(ctx, address) {
         storage.set(key, removeEmojis(formattedInfo))
 
         // Send screenshot
-        // if (screenshot) {
-        //     await ctx.replyWithPhoto(
-        //         { source: screenshot },
-        //         { caption: 'Bubble Map for Token' }
-        //     );
-        // }
+        if (screenshot) {
+            await ctx.replyWithPhoto(
+                { source: screenshot },
+                { caption: 'Bubble Map for Token' }
+            );
+        }
 
         // Send token information
         await ctx.reply(formattedInfo, { parse_mode: 'Markdown' });
